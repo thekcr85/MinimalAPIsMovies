@@ -43,8 +43,20 @@ app.MapGet("/genres/{id}", async (int id, IGenreRepository genreRepository) =>
 app.MapPost("/genres", async (Genre genre, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore) =>
 {
 	var id = await genreRepository.Create(genre);
-	await outputCacheStore.EvictByTagAsync("GetGenres", default); // Evict the cache for the GetGenres endpoint
+	await outputCacheStore.EvictByTagAsync("GetGenres", default);
 	return Results.Created($"/genres/{id}", genre);
+});
+
+app.MapPut("/genres/{id}", async (int id, Genre genre, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore) =>
+{
+	var exists = await genreRepository.Exists(id);
+	if (!exists)
+	{
+		return Results.NotFound();
+	}
+	await genreRepository.Update(genre);
+	await outputCacheStore.EvictByTagAsync("GetGenres", default);
+	return Results.NoContent();
 });
 
 app.Run();
