@@ -1,3 +1,11 @@
 ﻿### GET request
 GET https://localhost:7130/genres
 Accept: application/json
+
+### POST request
+POST http://localhost:7130/genres
+Content-Type: application/json
+
+{
+  "name": "Action"
+}

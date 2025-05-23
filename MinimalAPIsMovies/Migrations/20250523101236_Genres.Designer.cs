@@ -11,7 +11,7 @@ using MinimalAPIsMovies.Data;
 namespace MinimalAPIsMovies.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250523091704_Genres")]
+    [Migration("20250523101236_Genres")]
     partial class Genres
     {
         /// <inheritdoc />

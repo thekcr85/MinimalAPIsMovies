@@ -1,11 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using MinimalAPIsMovies.Data;
 using MinimalAPIsMovies.Models;
+using MinimalAPIsMovies.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 
 builder.Services.AddCors(options =>
 {
@@ -40,6 +43,12 @@ app.MapGet("/genres", () =>
 	};
 
 	return Results.Ok(genres);
+});
+
+app.MapPost("/genres", async (Genre genre, IGenreRepository genreRepository) => 
+{
+	var id = await genreRepository.Create(genre); // Call the repository to create the genre
+	return Results.Created($"/genres/{id}", genre); // Return the created genre with a 201 status code
 });
 
 app.Run();
