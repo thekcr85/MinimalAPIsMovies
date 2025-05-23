@@ -1,6 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using MinimalAPIsMovies.Data;
 using MinimalAPIsMovies.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddCors(options =>
 {
@@ -22,7 +27,7 @@ app.UseOutputCache();
 
 app.MapGet("/genres", () =>
 {
-	var genres = new List<Genre> 
+	var genres = new List<Genre>
 	{
 		new Genre { Id = 1, Name = "Action" },
 		new Genre { Id = 2, Name = "Comedy" },
