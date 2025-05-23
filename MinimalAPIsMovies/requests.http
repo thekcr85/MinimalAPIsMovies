@@ -1,0 +1,3 @@
+﻿### GET request
+GET https://localhost:7130/genres
+Accept: application/json
