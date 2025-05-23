@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using MinimalAPIsMovies.Data;
 using MinimalAPIsMovies.Models;
@@ -31,7 +32,7 @@ app.UseOutputCache();
 app.MapGet("/genres", async (IGenreRepository genreRepository) =>
 {
 	return await genreRepository.GetAll();
-});
+}).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("GetGenres"));
 
 app.MapGet("/genres/{id}", async (int id, IGenreRepository genreRepository) =>
 {
@@ -39,9 +40,10 @@ app.MapGet("/genres/{id}", async (int id, IGenreRepository genreRepository) =>
 	return genre is not null ? Results.Ok(genre) : Results.NotFound();
 });
 
-app.MapPost("/genres", async (Genre genre, IGenreRepository genreRepository) =>
+app.MapPost("/genres", async (Genre genre, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore) =>
 {
 	var id = await genreRepository.Create(genre);
+	await outputCacheStore.EvictByTagAsync("GetGenres", default); // Evict the cache for the GetGenres endpoint
 	return Results.Created($"/genres/{id}", genre);
 });
 

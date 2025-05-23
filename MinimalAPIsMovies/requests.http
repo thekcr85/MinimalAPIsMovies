@@ -7,5 +7,5 @@ POST http://localhost:7130/genres
 Content-Type: application/json
 
 {
-  "name": "Action"
+  "name": "Horror"
 }
