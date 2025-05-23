@@ -28,27 +28,21 @@ app.UseCors();
 
 app.UseOutputCache();
 
-app.MapGet("/genres", () =>
+app.MapGet("/genres", async (IGenreRepository genreRepository) =>
 {
-	var genres = new List<Genre>
-	{
-		new Genre { Id = 1, Name = "Action" },
-		new Genre { Id = 2, Name = "Comedy" },
-		new Genre { Id = 3, Name = "Drama" },
-		new Genre { Id = 4, Name = "Fantasy" },
-		new Genre { Id = 5, Name = "Horror" },
-		new Genre { Id = 6, Name = "Romance" },
-		new Genre { Id = 7, Name = "Sci-Fi" },
-		new Genre { Id = 8, Name = "Thriller" }
-	};
-
-	return Results.Ok(genres);
+	return await genreRepository.GetAll();
 });
 
-app.MapPost("/genres", async (Genre genre, IGenreRepository genreRepository) => 
+app.MapGet("/genres/{id}", async (int id, IGenreRepository genreRepository) =>
 {
-	var id = await genreRepository.Create(genre); // Call the repository to create the genre
-	return Results.Created($"/genres/{id}", genre); // Return the created genre with a 201 status code
+	var genre = await genreRepository.GetById(id);
+	return genre is not null ? Results.Ok(genre) : Results.NotFound();
+});
+
+app.MapPost("/genres", async (Genre genre, IGenreRepository genreRepository) =>
+{
+	var id = await genreRepository.Create(genre);
+	return Results.Created($"/genres/{id}", genre);
 });
 
 app.Run();
