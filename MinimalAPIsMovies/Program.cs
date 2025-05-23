@@ -12,9 +12,13 @@ builder.Services.AddCors(options =>
 	});
 });
 
+builder.Services.AddOutputCache();
+
 var app = builder.Build();
 
 app.UseCors();
+
+app.UseOutputCache();
 
 app.MapGet("/genres", () =>
 {
