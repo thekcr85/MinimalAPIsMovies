@@ -59,4 +59,16 @@ app.MapPut("/genres/{id}", async (int id, Genre genre, IGenreRepository genreRep
 	return Results.NoContent();
 });
 
+app.MapDelete("/genres/{id}", async (int id, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore) =>
+{
+	var exists = await genreRepository.Exists(id);
+	if (!exists)
+	{
+		return Results.NotFound();
+	}
+	await genreRepository.Delete(id);
+	await outputCacheStore.EvictByTagAsync("GetGenres", default);
+	return Results.NoContent();
+});
+
 app.Run();

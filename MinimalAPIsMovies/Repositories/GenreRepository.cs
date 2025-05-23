@@ -29,5 +29,16 @@ namespace MinimalAPIsMovies.Repositories
 		{
 			return await _context.Genres.FindAsync(id); // Fetch a genre by its ID
 		}
+
+		public async Task<bool> Exists(int id)
+		{
+			return await _context.Genres.AnyAsync(g => g.Id == id); // Check if a genre exists by its ID
+		}
+
+		public async Task Update(Genre genre)
+		{
+			_context.Update(genre); // Update the genre in the context
+			await _context.SaveChangesAsync(); 
+		}
 	}
 }
