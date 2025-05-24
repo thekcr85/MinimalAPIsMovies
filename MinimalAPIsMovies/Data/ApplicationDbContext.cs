@@ -9,8 +9,8 @@ namespace MinimalAPIsMovies.Data
 		{
 		}
 
-		public DbSet<Genre> Genres { get; set; } = null!; // DbSet property for the Genre entity
-		public DbSet<Actor> Actors { get; set; } = null!; // DbSet property for the Actor entity
+		public DbSet<Genre> Genres { get; set; }
+		public DbSet<Actor> Actors { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -20,6 +20,9 @@ namespace MinimalAPIsMovies.Data
 				base.OnModelCreating(modelBuilder);
 
 				modelBuilder.Entity<Genre>().Property(g => g.Name).HasMaxLength(150);
+
+				modelBuilder.Entity<Actor>().Property(a => a.Name).HasMaxLength(150);
+				modelBuilder.Entity<Actor>().Property(a => a.Picture).IsUnicode();
 			}
 		}
 	}
