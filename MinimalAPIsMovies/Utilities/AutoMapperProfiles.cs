@@ -2,16 +2,16 @@
 using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Models;
 
-namespace MinimalAPIsMovies.Utilities
+namespace MinimalAPIsMovies.Utilities;
+
+public class AutoMapperProfiles : Profile
 {
-	public class AutoMapperProfiles : Profile
+	public AutoMapperProfiles()
 	{
-		public AutoMapperProfiles()
-		{
-			CreateMap<Genre, GenreDTO>();
-			CreateMap<CreateGenreDTO, Genre>();
-			CreateMap<Genre, CreateGenreDTO>();
-			CreateMap<GenreDTO, Genre>();
-		}
+		CreateMap<Genre, GenreDTO>().ReverseMap();
+		CreateMap<Genre, CreateGenreDTO>().ReverseMap();
+
+		CreateMap<Actor, ActorDTO>().ReverseMap();
+		CreateMap<Actor, CreateActorDTO>().ReverseMap();
 	}
 }

@@ -13,7 +13,9 @@ namespace MinimalAPIsMovies.Repositories
 
 		public async Task<Actor?> GetById(int id)
 		{
-			return await context.Actors.FindAsync(id); // Fetch an actor by its ID
+			return await context.Actors.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id); // Fetch an actor by its ID without tracking changes,
+																							 // because we are not updating it in this method,
+																							 // so we can use AsNoTracking for better performance
 		}
 
 		public async Task<int> Create(Actor actor)
