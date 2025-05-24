@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
+using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Models;
 using MinimalAPIsMovies.Repositories;
 using System.Runtime.CompilerServices;
@@ -35,8 +36,9 @@ namespace MinimalAPIsMovies.Endpoints
 			return genre is not null ? TypedResults.Ok(genre) : TypedResults.NotFound();
 		}
 
-		static async Task<Created<Genre>> CreateGenre(Genre genre, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore)
+		static async Task<Created<Genre>> CreateGenre(CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore)
 		{
+			var genre = new Genre { Name = createGenreDTO.Name }; // Map DTO to model
 			var id = await genreRepository.Create(genre); // Create the genre and get the new ID
 			await outputCacheStore.EvictByTagAsync("GetGenres", default); // Evict the cache for GetGenres
 			return TypedResults.Created($"/genres/{id}", genre);
