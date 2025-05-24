@@ -24,33 +24,44 @@ namespace MinimalAPIsMovies.Endpoints
 			return routeGroupBuilder;
 		}
 
-		static async Task<Ok<IEnumerable<Genre>>> GetGenres(IGenreRepository genreRepository)
+		static async Task<Ok<IEnumerable<GenreDTO>>> GetGenres(IGenreRepository genreRepository)
 		{
 			var genres = await genreRepository.GetAll();
-			return TypedResults.Ok(genres);
+			var genresDTO = genres.Select(g => new GenreDTO { Id = g.Id, Name = g.Name }); // Here we map the Genre model to GenreDTO
+			return TypedResults.Ok(genresDTO);
 		}
 
-		static async Task<Results<Ok<Genre>, NotFound>> GetGenre(int id, IGenreRepository genreRepository)
+		static async Task<Results<Ok<GenreDTO>, NotFound>> GetGenre(int id, IGenreRepository genreRepository)
 		{
 			var genre = await genreRepository.GetById(id);
-			return genre is not null ? TypedResults.Ok(genre) : TypedResults.NotFound();
+
+			if (genre == null)
+			{
+				return TypedResults.NotFound();
+			}
+
+			var genreDTO = new GenreDTO { Id = genre.Id, Name = genre.Name }; // Map model to DTO because we are returning DTO
+
+			return TypedResults.Ok(genreDTO);
 		}
 
-		static async Task<Created<Genre>> CreateGenre(CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore)
+		static async Task<Created<GenreDTO>> CreateGenre(CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore)
 		{
 			var genre = new Genre { Name = createGenreDTO.Name }; // Map DTO to model
 			var id = await genreRepository.Create(genre); // Create the genre and get the new ID
 			await outputCacheStore.EvictByTagAsync("GetGenres", default); // Evict the cache for GetGenres
-			return TypedResults.Created($"/genres/{id}", genre);
+			var genreDTO = new GenreDTO { Id = id, Name = genre.Name }; // Map model to DTO for response
+			return TypedResults.Created($"/genres/{id}", genreDTO);
 		}
 
-		static async Task<Results<NoContent, NotFound>> UpdateGenre(int id, Genre genre, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore)
+		static async Task<Results<NoContent, NotFound>> UpdateGenre(int id, CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore)
 		{
 			var exists = await genreRepository.Exists(id);
 			if (!exists)
 			{
 				return TypedResults.NotFound();
 			}
+			var genre = new Genre { Id = id, Name = createGenreDTO.Name }; // Map DTO to model with ID
 			await genreRepository.Update(genre);
 			await outputCacheStore.EvictByTagAsync("GetGenres", default);
 			return TypedResults.NoContent();
