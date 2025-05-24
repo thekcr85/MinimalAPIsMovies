@@ -10,19 +10,19 @@ namespace MinimalAPIsMovies.Endpoints
 {
 	public static class GenresEndpoints
 	{
-		public static RouteGroupBuilder MapGenres(this RouteGroupBuilder routeGroupBuilder)
+		public static RouteGroupBuilder MapGenres(this RouteGroupBuilder group)
 		{
-			routeGroupBuilder.MapGet("/", GetGenres).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("GetGenres"));
+			group.MapGet("/", GetGenres).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("GetGenres"));
 
-			routeGroupBuilder.MapGet("/{id}", GetGenre);
+			group.MapGet("/{id}", GetGenre);
 
-			routeGroupBuilder.MapPost("/", CreateGenre);
+			group.MapPost("/", CreateGenre);
 
-			routeGroupBuilder.MapPut("/{id}", UpdateGenre);
+			group.MapPut("/{id}", UpdateGenre);
 
-			routeGroupBuilder.MapDelete("/{id}", DeleteGenre);
+			group.MapDelete("/{id}", DeleteGenre);
 
-			return routeGroupBuilder;
+			return group;
 		}
 
 		static async Task<Ok<IEnumerable<GenreDTO>>> GetGenres(IGenreRepository genreRepository, IMapper mapper)
