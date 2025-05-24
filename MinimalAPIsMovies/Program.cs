@@ -13,6 +13,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddCors(options =>
 {
 	options.AddDefaultPolicy(builder =>
