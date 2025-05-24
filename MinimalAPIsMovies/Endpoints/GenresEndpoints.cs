@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
 using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Models;
@@ -24,14 +25,14 @@ namespace MinimalAPIsMovies.Endpoints
 			return routeGroupBuilder;
 		}
 
-		static async Task<Ok<IEnumerable<GenreDTO>>> GetGenres(IGenreRepository genreRepository)
+		static async Task<Ok<IEnumerable<GenreDTO>>> GetGenres(IGenreRepository genreRepository, IMapper mapper)
 		{
 			var genres = await genreRepository.GetAll();
-			var genresDTO = genres.Select(g => new GenreDTO { Id = g.Id, Name = g.Name }); // Here we map the Genre model to GenreDTO
+			var genresDTO = mapper.Map<IEnumerable<GenreDTO>>(genres); // Use AutoMapper to map models to DTOs
 			return TypedResults.Ok(genresDTO);
 		}
 
-		static async Task<Results<Ok<GenreDTO>, NotFound>> GetGenre(int id, IGenreRepository genreRepository)
+		static async Task<Results<Ok<GenreDTO>, NotFound>> GetGenre(int id, IGenreRepository genreRepository, IMapper mapper)
 		{
 			var genre = await genreRepository.GetById(id);
 
@@ -40,28 +41,29 @@ namespace MinimalAPIsMovies.Endpoints
 				return TypedResults.NotFound();
 			}
 
-			var genreDTO = new GenreDTO { Id = genre.Id, Name = genre.Name }; // Map model to DTO because we are returning DTO
+			var genreDTO = mapper.Map<GenreDTO>(genre); // Use AutoMapper to map model to DTO
 
 			return TypedResults.Ok(genreDTO);
 		}
 
-		static async Task<Created<GenreDTO>> CreateGenre(CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore)
+		static async Task<Created<GenreDTO>> CreateGenre(CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore, IMapper mapper)
 		{
-			var genre = new Genre { Name = createGenreDTO.Name }; // Map DTO to model
+			var genre = mapper.Map<Genre>(createGenreDTO); // Use AutoMapper to map DTO to model
 			var id = await genreRepository.Create(genre); // Create the genre and get the new ID
 			await outputCacheStore.EvictByTagAsync("GetGenres", default); // Evict the cache for GetGenres
-			var genreDTO = new GenreDTO { Id = id, Name = genre.Name }; // Map model to DTO for response
+			var genreDTO = mapper.Map<GenreDTO>(genre); // Map the created genre to DTO
 			return TypedResults.Created($"/genres/{id}", genreDTO);
 		}
 
-		static async Task<Results<NoContent, NotFound>> UpdateGenre(int id, CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore)
+		static async Task<Results<NoContent, NotFound>> UpdateGenre(int id, CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore, IMapper mapper)
 		{
 			var exists = await genreRepository.Exists(id);
 			if (!exists)
 			{
 				return TypedResults.NotFound();
 			}
-			var genre = new Genre { Id = id, Name = createGenreDTO.Name }; // Map DTO to model with ID
+			var genre = mapper.Map<Genre>(createGenreDTO); // Use AutoMapper to map DTO to model
+			genre.Id = id; // Set the ID for the genre to update
 			await genreRepository.Update(genre);
 			await outputCacheStore.EvictByTagAsync("GetGenres", default);
 			return TypedResults.NoContent();
