@@ -2,10 +2,25 @@
 GET https://localhost:7130/genres
 Accept: application/json
 
+### GET request with specific ID
+GET https://localhost:7130/genres/1
+Accept: application/json
+
 ### POST request
-POST http://localhost:7130/genres
+POST https://localhost:7130/genres
 Content-Type: application/json
 
 {
-  "name": "Horror"
+  "name": "War"
 }
+
+### PUT request
+PUT https://localhost:7130/genres/5
+Content-Type: application/json
+{
+  "name": "Arthouse"
+}
+
+### DELETE request
+DELETE https://localhost:7130/genres/9
+Accept: application/json
