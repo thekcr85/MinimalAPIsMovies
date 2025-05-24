@@ -10,6 +10,7 @@ namespace MinimalAPIsMovies.Data
 		}
 
 		public DbSet<Genre> Genres { get; set; } = null!; // DbSet property for the Genre entity
+		public DbSet<Actor> Actors { get; set; } = null!; // DbSet property for the Actor entity
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
