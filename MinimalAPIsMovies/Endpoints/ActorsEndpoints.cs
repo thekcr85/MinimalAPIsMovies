@@ -11,11 +11,15 @@ namespace MinimalAPIsMovies.Endpoints
 {
 	public static class ActorsEndpoints
 	{
-		private readonly static string container = "actors"; // Define the container for file storage
+		private readonly static string container = "actors"; // Container name for file storage
 
 		public static RouteGroupBuilder MapActors(this RouteGroupBuilder group)
 		{
-			group.MapPost("/", CreateActor).DisableAntiforgery(); // Disable antiforgery for file uploads, because IFormFile is used
+			group.MapGet("/", GetActors).CacheOutput(c => c.Expire(TimeSpan.FromMinutes(1)).Tag("GetActors"));
+			group.MapGet("/getActorsByName/{name}", GetActorsByName);
+			group.MapGet("/{id}", GetActorById);
+			group.MapPost("/", CreateActor).DisableAntiforgery();
+
 			return group;
 		}
 
@@ -23,15 +27,40 @@ namespace MinimalAPIsMovies.Endpoints
 		{
 			var actor = mapper.Map<Actor>(createActorDTO);
 
-			if (createActorDTO.Picture != null) 
+			if (createActorDTO.Picture != null)
 			{
 				actor.Picture = await fileStorage.Store(container, createActorDTO.Picture); // Store the picture file and set the Picture property
 			}
 
-			var id = await actorRepository.Create(actor); 
+			var id = await actorRepository.Create(actor);
 			await outputCacheStore.EvictByTagAsync("GetActors", default);
 			var actorDTO = mapper.Map<ActorDTO>(actor);
 			return TypedResults.Created($"/actors/{id}", actorDTO);
+		}
+
+		static async Task<Ok<IEnumerable<ActorDTO>>> GetActors(IActorRepository actorRepository, IMapper mapper)
+		{
+			var actors = await actorRepository.GetAll();
+			var actorsDTO = mapper.Map<IEnumerable<ActorDTO>>(actors);
+			return TypedResults.Ok(actorsDTO);
+		}
+
+		static async Task<Ok<IEnumerable<ActorDTO>>> GetActorsByName(string name, IActorRepository actorRepository, IMapper mapper)
+		{
+			var actors = await actorRepository.GetAllByName(name);
+			var actorsDTO = mapper.Map<IEnumerable<ActorDTO>>(actors);
+			return TypedResults.Ok(actorsDTO);
+		}
+
+		static async Task<Results<NotFound, Ok<ActorDTO>>> GetActorById(int id, IActorRepository actorRepository, IMapper mapper)
+		{
+			var actor = await actorRepository.GetById(id);
+			if (actor == null)
+			{
+				return TypedResults.NotFound();
+			}
+			var actorDTO = mapper.Map<ActorDTO>(actor);
+			return TypedResults.Ok(actorDTO);
 		}
 	}
 }

@@ -40,5 +40,13 @@ namespace MinimalAPIsMovies.Repositories
 		{
 			await context.Actors.Where(a => a.Id == id).ExecuteDeleteAsync();
 		}  
+
+		public async Task<IEnumerable<Actor>> GetAllByName(string name)
+		{
+			return await context.Actors
+				.Where(a => a.Name.Contains(name, StringComparison.OrdinalIgnoreCase)) // Filter actors by name, case-insensitive
+				.OrderBy(a => a.Name) // Order the results by name
+				.ToListAsync(); // Fetch the results as a list asynchronously
+		}
 	}
 }
