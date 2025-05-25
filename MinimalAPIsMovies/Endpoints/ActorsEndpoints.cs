@@ -20,6 +20,7 @@ namespace MinimalAPIsMovies.Endpoints
 			group.MapGet("/{id}", GetActorById);
 			group.MapPost("/", CreateActor).DisableAntiforgery();
 			group.MapPut("/{id}", UpdateActor).DisableAntiforgery();
+			group.MapDelete("/{id}", DeleteActor).DisableAntiforgery();
 
 			return group;
 		}
@@ -90,7 +91,21 @@ namespace MinimalAPIsMovies.Endpoints
 			await actorRepository.Update(actorForUpdate);
 			await outputCacheStore.EvictByTagAsync("GetActors", default);
 			return TypedResults.NoContent();
+		}
 
+		static async Task<Results<NoContent, NotFound>> DeleteActor(int id, IActorRepository actorRepository, IMapper mapper, IOutputCacheStore outputCacheStore, IFileStorage fileStorage)
+		{
+			var actorDb = await actorRepository.GetById(id);
+
+			if (actorDb == null)
+			{
+				return TypedResults.NotFound();
+			}
+
+			await actorRepository.Delete(id);
+			await fileStorage.Delete(actorDb.Picture, container); // Delete the actor's picture from storage
+			await outputCacheStore.EvictByTagAsync("GetActors", default);
+			return TypedResults.NoContent();
 		}
 	}
 }
