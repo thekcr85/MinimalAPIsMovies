@@ -11,6 +11,7 @@ namespace MinimalAPIsMovies.Data
 
 		public DbSet<Genre> Genres { get; set; }
 		public DbSet<Actor> Actors { get; set; }
+		public DbSet<Movie> Movies { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -23,6 +24,9 @@ namespace MinimalAPIsMovies.Data
 
 				modelBuilder.Entity<Actor>().Property(a => a.Name).HasMaxLength(150);
 				modelBuilder.Entity<Actor>().Property(a => a.Picture).IsUnicode();
+
+				modelBuilder.Entity<Movie>().Property(a => a.Title).HasMaxLength(250);
+				modelBuilder.Entity<Movie>().Property(a => a.Poster).IsUnicode(); // Ensure that the Poster property is stored as a string in the database
 			}
 		}
 	}

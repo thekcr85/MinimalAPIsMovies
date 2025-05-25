@@ -20,7 +20,7 @@ namespace MinimalAPIsMovies.Endpoints
 			group.MapGet("/{id}", GetActorById);
 			group.MapPost("/", CreateActor).DisableAntiforgery();
 			group.MapPut("/{id}", UpdateActor).DisableAntiforgery();
-			group.MapDelete("/{id}", DeleteActor).DisableAntiforgery();
+			group.MapDelete("/{id}", DeleteActor);
 
 			return group;
 		}
