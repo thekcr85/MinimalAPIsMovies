@@ -1,6 +1,6 @@
 ﻿using MinimalAPIsMovies.DTOs;
 
-namespace MinimalAPIsMovies.Repositories
+namespace MinimalAPIsMovies.Extensions
 {
 	public static class IQueryableExtensions
 	{

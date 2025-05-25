@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
-namespace MinimalAPIsMovies.Repositories
+namespace MinimalAPIsMovies.Extensions
 {
 	public static class HttpContextExtensions
 	{

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MinimalAPIsMovies.Data;
 using MinimalAPIsMovies.DTOs;
+using MinimalAPIsMovies.Extensions;
 using MinimalAPIsMovies.Models;
 
 namespace MinimalAPIsMovies.Repositories
