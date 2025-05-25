@@ -83,5 +83,21 @@ namespace MinimalAPIsMovies.Endpoints
 			await outputCacheStore.EvictByTagAsync("GetComments", default);
 			return TypedResults.NoContent();
 		}
+
+		static async Task<Results<NotFound, NoContent>> DeleteComment(int movieId, int id, ICommentRepository commentRepository, IMovieRepository movieRepository, IMapper mapper, IOutputCacheStore outputCacheStore)
+		{
+			if (!await movieRepository.Exists(movieId))
+			{
+				return TypedResults.NotFound();
+			}
+
+			if (!await commentRepository.Exists(id))
+			{
+				return TypedResults.NotFound();
+			}
+			await commentRepository.Delete(id);
+			await outputCacheStore.EvictByTagAsync("GetComments", default);
+			return TypedResults.NoContent();
+		}
 	}
 }
