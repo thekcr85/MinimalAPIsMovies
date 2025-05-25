@@ -20,5 +20,8 @@ public class AutoMapperProfiles : Profile
 		CreateMap<Movie, CreateMovieDTO>().ReverseMap()
 			.ForMember(p => p.Poster, options => options.Ignore()); // Ignore the Poster property when mapping
 																	// from CreateMovieDTO to Movie, as it will be handled separately
+		
+		CreateMap<Comment, CommentDTO>().ReverseMap();
+		CreateMap<Comment, CreateCommentDTO>().ReverseMap();
 	}
 }
