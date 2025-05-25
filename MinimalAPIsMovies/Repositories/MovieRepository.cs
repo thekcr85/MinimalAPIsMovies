@@ -20,7 +20,12 @@ namespace MinimalAPIsMovies.Repositories
 
 		public async Task<Movie?> GetById(int id)
 		{
-			return await context.Movies.FirstOrDefaultAsync(m => m.Id == id);
+			return await context.Movies.AsNoTracking().FirstOrDefaultAsync(m => m.Id == id);
+		}
+
+		public async Task<bool> Exists(int id)
+		{
+			return await context.Movies.AnyAsync(m => m.Id == id);
 		}
 
 		public async Task<int> Create(Movie movie)
