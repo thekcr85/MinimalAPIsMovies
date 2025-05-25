@@ -12,13 +12,45 @@ namespace MinimalAPIsMovies.Endpoints
 	{
 		public static RouteGroupBuilder MapComments(this RouteGroupBuilder group)
 		{
+			group.MapGet("/", GetComments).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("GetComments"));
+			group.MapGet("/{id}", GetComment);
 			group.MapPost("/", CreateComment);
 			return group;
 		}
 
-		static async Task<Results<Created<CommentDTO>, NotFound>> CreateComment(int movieId, CreateCommentDTO createCommentDTO, ICommentRepository commentRepository, IMovieRepository moviesRepository, IMapper mapper, IOutputCacheStore outputCacheStore)
+		static async Task<Results<Ok<IEnumerable<CommentDTO>>, NotFound>> GetComments(int movieId, ICommentRepository commentRepository, IMovieRepository movieRepository, IMapper mapper)
 		{
-			if (!await moviesRepository.Exists(movieId))
+			if (!await movieRepository.Exists(movieId))
+			{
+				return TypedResults.NotFound();
+			}
+			
+			var comments = await commentRepository.GetAll(movieId);
+			var commentsDTO = mapper.Map<IEnumerable<CommentDTO>>(comments);
+			return TypedResults.Ok(commentsDTO);
+		}
+
+		static async Task<Results<NotFound, Ok<CommentDTO>>> GetComment(int movieId, int id, IMovieRepository movieRepository, ICommentRepository commentRepository, IMapper mapper)
+		{
+			if (!await movieRepository.Exists(movieId))
+			{
+				return TypedResults.NotFound();
+			}
+
+			var comment = await commentRepository.GetById(id);
+			if (comment == null)
+			{
+				return TypedResults.NotFound();
+			}
+
+			var commentDTO = mapper.Map<CommentDTO>(comment);
+			return TypedResults.Ok(commentDTO);
+
+		}
+
+		static async Task<Results<Created<CommentDTO>, NotFound>> CreateComment(int movieId, CreateCommentDTO createCommentDTO, ICommentRepository commentRepository, IMovieRepository movieRepository, IMapper mapper, IOutputCacheStore outputCacheStore)
+		{
+			if (!await movieRepository.Exists(movieId))
 			{
 				return TypedResults.NotFound();
 			}

@@ -23,5 +23,6 @@ public class AutoMapperProfiles : Profile
 		
 		CreateMap<Comment, CommentDTO>().ReverseMap();
 		CreateMap<Comment, CreateCommentDTO>().ReverseMap();
+		CreateMap<IEnumerable<Comment>, IEnumerable<CommentDTO>>().ReverseMap();
 	}
 }
