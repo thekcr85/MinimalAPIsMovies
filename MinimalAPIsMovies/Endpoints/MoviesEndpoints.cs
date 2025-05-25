@@ -12,7 +12,7 @@ namespace MinimalAPIsMovies.Endpoints
 {
 	public static class MoviesEndpoints
 	{
-		private readonly static string container = "movies";
+		private readonly static string container = "images/movies";
 
 		public static RouteGroupBuilder MapMovies(this RouteGroupBuilder group)
 		{
@@ -87,4 +87,5 @@ namespace MinimalAPIsMovies.Endpoints
 			await outputCacheStore.EvictByTagAsync("GetMovies", default); // Evict the cache for GetMovies
 			return TypedResults.NoContent();
 		}
+	}
 }

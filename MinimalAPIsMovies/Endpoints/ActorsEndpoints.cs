@@ -11,7 +11,7 @@ namespace MinimalAPIsMovies.Endpoints
 {
 	public static class ActorsEndpoints
 	{
-		private readonly static string container = "actors"; // Container name for file storage
+		private readonly static string container = "images/actors"; // Container name for file storage
 
 		public static RouteGroupBuilder MapActors(this RouteGroupBuilder group)
 		{
@@ -23,21 +23,6 @@ namespace MinimalAPIsMovies.Endpoints
 			group.MapDelete("/{id}", DeleteActor);
 
 			return group;
-		}
-
-		static async Task<Created<ActorDTO>> CreateActor([FromForm] CreateActorDTO createActorDTO, IActorRepository actorRepository, IOutputCacheStore outputCacheStore, IMapper mapper, IFileStorage fileStorage)
-		{
-			var actor = mapper.Map<Actor>(createActorDTO);
-
-			if (createActorDTO.Picture != null)
-			{
-				actor.Picture = await fileStorage.Store(container, createActorDTO.Picture); // Store the picture file and set the Picture property
-			}
-
-			var id = await actorRepository.Create(actor);
-			await outputCacheStore.EvictByTagAsync("GetActors", default);
-			var actorDTO = mapper.Map<ActorDTO>(actor);
-			return TypedResults.Created($"/actors/{id}", actorDTO);
 		}
 
 		static async Task<Ok<IEnumerable<ActorDTO>>> GetActors(IActorRepository actorRepository, IMapper mapper, int page = 1, int recordsPerPage = 10)
@@ -68,6 +53,21 @@ namespace MinimalAPIsMovies.Endpoints
 			}
 			var actorDTO = mapper.Map<ActorDTO>(actor);
 			return TypedResults.Ok(actorDTO);
+		}
+
+		static async Task<Created<ActorDTO>> CreateActor([FromForm] CreateActorDTO createActorDTO, IActorRepository actorRepository, IOutputCacheStore outputCacheStore, IMapper mapper, IFileStorage fileStorage)
+		{
+			var actor = mapper.Map<Actor>(createActorDTO);
+
+			if (createActorDTO.Picture != null)
+			{
+				actor.Picture = await fileStorage.Store(container, createActorDTO.Picture); // Store the picture file and set the Picture property
+			}
+
+			var id = await actorRepository.Create(actor);
+			await outputCacheStore.EvictByTagAsync("GetActors", default);
+			var actorDTO = mapper.Map<ActorDTO>(actor);
+			return TypedResults.Created($"/actors/{id}", actorDTO);
 		}
 
 		static async Task<Results<NoContent, NotFound>> UpdateActor(int id, [FromForm] CreateActorDTO createActorDTO, IActorRepository actorRepository, IOutputCacheStore outputCacheStore, IMapper mapper, IFileStorage fileStorage)
