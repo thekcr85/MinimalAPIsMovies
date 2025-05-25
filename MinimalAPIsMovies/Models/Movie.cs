@@ -8,5 +8,6 @@
 		public DateTime ReleaseDate { get; set; }
 		public string? Poster { get; set; }
 		public ICollection<Comment> Comments { get; set; } = new List<Comment>(); // Navigation property
+		public ICollection<GenreMovie> GenresMovies { get; set; } = new List<GenreMovie>(); // Navigation property for the many-to-many relationship
 	}
 }
