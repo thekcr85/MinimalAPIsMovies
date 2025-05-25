@@ -15,6 +15,9 @@ namespace MinimalAPIsMovies.Endpoints
 			group.MapGet("/", GetComments).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("GetComments"));
 			group.MapGet("/{id}", GetComment);
 			group.MapPost("/", CreateComment);
+			group.MapPut("/{id}", UpdateComment);
+			group.MapDelete("/{id}", DeleteComment); 
+
 			return group;
 		}
 
