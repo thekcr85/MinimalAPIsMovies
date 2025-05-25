@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MinimalAPIsMovies.Models;
 
 namespace MinimalAPIsMovies.Data
@@ -13,7 +14,7 @@ namespace MinimalAPIsMovies.Data
 		public DbSet<Actor> Actors { get; set; }
 		public DbSet<Movie> Movies { get; set; }
 		public DbSet<Comment> Comments { get; set; }
-		public DbSet<GenreMovie> GenreMovies { get; set; } // DbSet for the join entity
+		public DbSet<GenreMovie> GenresMovies { get; set; } // DbSet for the join entity
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -29,6 +30,9 @@ namespace MinimalAPIsMovies.Data
 
 				modelBuilder.Entity<Movie>().Property(a => a.Title).HasMaxLength(250);
 				modelBuilder.Entity<Movie>().Property(a => a.Poster).IsUnicode(); // Ensure that the Poster property is stored as a string in the database
+
+				modelBuilder.Entity<GenreMovie>()
+					.HasKey(gm => new { gm.MovieId, gm.GenreId }); // Composite key for the join entity 
 			}
 		}
 	}
