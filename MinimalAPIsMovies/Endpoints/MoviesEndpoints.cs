@@ -19,6 +19,7 @@ namespace MinimalAPIsMovies.Endpoints
 			group.MapGet("/", GetMovies).CacheOutput(c => c.Expire(TimeSpan.FromMinutes(1)).Tag("GetMovies"));
 			group.MapGet("/{id}", GetMovie);
 			group.MapPost("/", CreateMovie).DisableAntiforgery();
+			group.MapPut("/{id}", UpdateMovie).DisableAntiforgery();
 			return group;
 		}
 
@@ -52,6 +53,25 @@ namespace MinimalAPIsMovies.Endpoints
 			await outputCacheStore.EvictByTagAsync("GetMovies", default);
 			var movieDTO = mapper.Map<MovieDTO>(movie);
 			return TypedResults.Created($"/movies/{id}", movieDTO);
+		}
+
+		static async Task<Results<NotFound, NoContent>> UpdateMovie(int id, [FromForm] CreateMovieDTO createMovieDTO, IMovieRepository movieRepository, IMapper mapper, IFileStorage fileStorage, IOutputCacheStore outputCacheStore)
+		{
+			var movieDb = await movieRepository.GetById(id);
+			if (movieDb is null)
+			{
+				return TypedResults.NotFound();
+			}
+			var movieForUpdate = mapper.Map(createMovieDTO, movieDb); // Map the DTO to the existing movie entity
+			movieForUpdate.Id = id; // Ensure the ID is set correctly
+			movieForUpdate.Poster = movieDb.Poster;
+			if (createMovieDTO.Poster != null)
+			{
+				movieForUpdate.Poster = await fileStorage.Store(container, createMovieDTO.Poster); // Store the new poster if provided
+			}
+			await movieRepository.Update(movieForUpdate);
+			await outputCacheStore.EvictByTagAsync("GetMovies", default); // Evict the cache for GetMovies
+			return TypedResults.NoContent();
 		}
 	}
 }
