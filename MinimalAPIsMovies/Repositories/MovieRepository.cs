@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using MinimalAPIsMovies.Data;
 using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Extensions;
@@ -6,7 +7,7 @@ using MinimalAPIsMovies.Models;
 
 namespace MinimalAPIsMovies.Repositories
 {
-	public class MovieRepository(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor) : IMovieRepository
+	public class MovieRepository(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, IMapper mapper) : IMovieRepository
 	{
 		public async Task<IEnumerable<Movie>> GetAll(PaginationDTO paginationDTO)
 		{
@@ -46,6 +47,22 @@ namespace MinimalAPIsMovies.Repositories
 		public async Task Delete(int id)
 		{
 			await context.Movies.Where(m => m.Id == id).ExecuteDeleteAsync();
+		}
+
+		public async Task Assign(int id, List<int> genresIds)
+		{
+			var movie = await context.Movies.Include(m => m.GenresMovies).FirstOrDefaultAsync(m => m.Id == id);
+
+			if (movie == null)
+			{
+				throw new KeyNotFoundException($"Movie with ID {id} not found.");
+			}
+
+			var genresMovies = genresIds.Select(genreId => new GenreMovie { MovieId = id, GenreId = genreId }).ToList(); // Create a list of GenreMovie entities to be added
+			movie.GenresMovies = mapper.Map(genresMovies, movie.GenresMovies); // Map the new genres to the existing GenresMovies collection
+			await context.SaveChangesAsync();
+
+
 		}
 	}
 }

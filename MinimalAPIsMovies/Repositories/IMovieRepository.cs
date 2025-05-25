@@ -5,6 +5,7 @@ namespace MinimalAPIsMovies.Repositories
 {
 	public interface IMovieRepository
 	{
+		Task Assign(int id, List<int> genresIds);
 		Task<int> Create(Movie movie);
 		Task Delete(int id);
 		Task<bool> Exists(int id);
