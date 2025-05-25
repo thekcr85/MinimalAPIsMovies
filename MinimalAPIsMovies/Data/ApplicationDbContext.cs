@@ -13,6 +13,7 @@ namespace MinimalAPIsMovies.Data
 		public DbSet<Actor> Actors { get; set; }
 		public DbSet<Movie> Movies { get; set; }
 		public DbSet<Comment> Comments { get; set; }
+		public DbSet<GenreMovie> GenreMovies { get; set; } // DbSet for the join entity
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
