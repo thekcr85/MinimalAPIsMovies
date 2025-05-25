@@ -9,9 +9,9 @@ namespace MinimalAPIsMovies.Repositories
 	{
 		public async Task<IEnumerable<Actor>> GetAll(PaginationDTO paginationDTO)
 		{
-			var query = context.Actors.AsQueryable(); // Start with the Actors DbSet
-			await httpContextAccessor.HttpContext!.InsertPaginationParameterInResponseHeader(query); // Insert pagination parameters into the response header
-			return await query.OrderBy(a => a.Name).ToListAsync(); // Fetch all actors ordered by name
+			var queryable = context.Actors.AsQueryable(); // Start with the base query
+			await httpContextAccessor.HttpContext!.InsertPaginationParameterInResponseHeader(queryable);
+			return await queryable.OrderBy(a => a.Name).Pagination(paginationDTO).ToListAsync(); // Order actors by name and fetch them as a list asynchronously
 		}
 
 		public async Task<Actor?> GetById(int id)
