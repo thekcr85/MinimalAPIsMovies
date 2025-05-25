@@ -45,6 +45,6 @@ app.UseOutputCache();
 app.MapGroup("/genres").MapGenres();
 app.MapGroup("/actors").MapActors();
 app.MapGroup("/movies").MapMovies();
-app.MapGroup("/movie/{movieId}/comments").MapComments();
+app.MapGroup("/movies/{movieId}/comments").MapComments();
 
 app.Run();

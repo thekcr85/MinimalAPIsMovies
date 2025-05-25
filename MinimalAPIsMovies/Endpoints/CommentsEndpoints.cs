@@ -12,7 +12,7 @@ namespace MinimalAPIsMovies.Endpoints
 	{
 		public static RouteGroupBuilder MapComments(this RouteGroupBuilder group)
 		{
-			group.MapPost("/{movieId}/comments", CreateComment);
+			group.MapPost("/", CreateComment);
 			return group;
 		}
 
