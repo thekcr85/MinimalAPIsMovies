@@ -62,5 +62,26 @@ namespace MinimalAPIsMovies.Endpoints
 			var commentDTO = mapper.Map<CommentDTO>(comment);
 			return TypedResults.Created($"/movies/{movieId}/comments/{id}", commentDTO);
 		}
+
+		static async Task<Results<NotFound, NoContent>> UpdateComment(int movieId, int id, CreateCommentDTO createCommentDTO, ICommentRepository commentRepository, IMovieRepository movieRepository, IMapper mapper, IOutputCacheStore outputCacheStore)
+		{
+			if (!await movieRepository.Exists(movieId))
+			{
+				return TypedResults.NotFound();
+			}
+
+			if (!await commentRepository.Exists(id))
+			{
+				return TypedResults.NotFound();
+			}
+
+			var comment = mapper.Map<Comment>(createCommentDTO);
+			comment.Id = id; // Ensure the ID is set for the update
+			comment.MovieId = movieId; // Set the MovieId from the route parameter
+
+			await commentRepository.Update(comment);
+			await outputCacheStore.EvictByTagAsync("GetComments", default);
+			return TypedResults.NoContent();
+		}
 	}
 }
