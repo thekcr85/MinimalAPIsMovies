@@ -61,8 +61,6 @@ namespace MinimalAPIsMovies.Repositories
 			var genresMovies = genresIds.Select(genreId => new GenreMovie { MovieId = id, GenreId = genreId }).ToList(); // Create a list of GenreMovie entities to be added
 			movie.GenresMovies = mapper.Map(genresMovies, movie.GenresMovies); // Map the new genres to the existing GenresMovies collection
 			await context.SaveChangesAsync();
-
-
 		}
 	}
 }
