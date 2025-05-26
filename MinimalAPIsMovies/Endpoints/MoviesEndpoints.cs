@@ -22,6 +22,7 @@ namespace MinimalAPIsMovies.Endpoints
 			group.MapPut("/{id}", UpdateMovie).DisableAntiforgery();
 			group.MapDelete("/{id}", DeleteMovie);
 			group.MapPost("/{id}/assignGenres", AssignGenres);
+			group.MapPost("/{id}/assignActors", AssignActors);
 			return group;
 		}
 
@@ -112,5 +113,31 @@ namespace MinimalAPIsMovies.Endpoints
 			await movieRepository.Assign(id, existingGenresIds); // Assign the existing genre IDs to the movie
 			return TypedResults.NoContent();
 		}
+
+		static async Task<Results<NotFound, NoContent, BadRequest<string>>> AssignActors(int id, List<AssignActorMovieDTO> actorsDTO, IMovieRepository movieRepository, IActorRepository actorRepository, IMapper mapper)
+		{
+			if (!await movieRepository.Exists(id))
+			{
+				return TypedResults.NotFound();
+			}
+			var existingActorsIds = new List<int>();
+			var actorsIds = actorsDTO.Select(a => a.ActorId).ToList();
+
+			if (actorsIds.Count != 0)
+			{
+				existingActorsIds = await actorRepository.Exists(actorsIds);
+			}
+
+			if (existingActorsIds.Count != actorsDTO.Count) // Check if all provided actor IDs exist
+			{
+				var notFoundIds = actorsIds.Except(existingActorsIds); // Find the IDs that were not found
+				return TypedResults.BadRequest($"The following actors do not exist: {string.Join(", ", notFoundIds)}"); // Return a BadRequest with the missing actor IDs
+			}
+
+			var actors = mapper.Map<List<ActorMovie>>(actorsDTO); // Map the DTOs to ActorMovie entities
+			await movieRepository.Assign(id, actors); // Assign the actors to the movie
+			return TypedResults.NoContent();
+		}
+
 	}
 }
