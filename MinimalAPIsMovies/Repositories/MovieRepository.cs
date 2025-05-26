@@ -24,7 +24,7 @@ namespace MinimalAPIsMovies.Repositories
 			return await context.Movies
 				.Include(m => m.Comments) // Include Comments navigation property
 				.Include(m => m.GenresMovies).ThenInclude(gm => gm.Genre) // Include GenresMovies and Genre navigation properties
-				.Include(m => m.ActorsMovies).ThenInclude(am => am.Actor) // Include ActorsMovies and Actor navigation properties
+				.Include(m => m.ActorsMovies.OrderBy(am => am.Order)).ThenInclude(am => am.Actor) // Include ActorsMovies and Actor navigation properties
 				.AsNoTracking().FirstOrDefaultAsync(m => m.Id == id);
 		}
 
@@ -79,7 +79,7 @@ namespace MinimalAPIsMovies.Repositories
 				throw new KeyNotFoundException($"Movie with ID {id} not found.");
 			}
 
-			movie.ActorsMovies = mapper(actors, movie.ActorsMovies); // Map the new actors to the existing ActorsMovies collection
+			movie.ActorsMovies = mapper.Map(actors, movie.ActorsMovies); // Map the new actors to the existing ActorsMovies collection
 			await context.SaveChangesAsync();
 		}
 	}

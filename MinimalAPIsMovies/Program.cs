@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.OutputCaching;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using MinimalAPIsMovies.Data;
 using MinimalAPIsMovies.Endpoints;
-using MinimalAPIsMovies.Models;
 using MinimalAPIsMovies.Repositories;
 using MinimalAPIsMovies.Services;
 
@@ -21,6 +19,8 @@ builder.Services.AddTransient<IFileStorage, LocalFileStorage>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddCors(options =>
 {
