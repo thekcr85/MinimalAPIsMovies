@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using MinimalAPIsMovies.DTOs;
 using MinimalAPIsMovies.Repositories;
+using MinimalAPIsMovies.Utilities;
 
 namespace MinimalAPIsMovies.Validations
 {
@@ -17,20 +18,14 @@ namespace MinimalAPIsMovies.Validations
 			}
 
 			RuleFor(x => x.Name)
-				.NotEmpty().WithMessage("The field {PropertyName} is required")
-				.MaximumLength(50).WithMessage("The field {PropertyName} must not exceed {MaxLength} characters")
-				.Must(FirstLetterIsUpperCase).WithMessage("The field {PropertyName} should start with uppercase")
+				.NotEmpty().WithMessage(ValidationMessages.NonEmpty)
+				.MaximumLength(50).WithMessage(ValidationMessages.MaximumLength)
+				.Must(ValidationHelpers.FirstLetterIsUpperCase).WithMessage(ValidationMessages.FirstLetterIsUpperCase)
 				.MustAsync(async (name, _) =>
 				{
 					var exists = await genreRepository.Exists(id, name);
 					return !exists; // Ensure the genre name does not already exist
 				}).WithMessage(g => $"A genre with the name {g.Name} already exists");
 		}
-
-		private static bool FirstLetterIsUpperCase(string value)
-		{
-			return string.IsNullOrEmpty(value) || char.IsUpper(value[0]);
-		}
-
 	}
 }
