@@ -23,5 +23,7 @@ public class AutoMapperProfiles : Profile
 		
 		CreateMap<Comment, CommentDTO>().ReverseMap();
 		CreateMap<Comment, CreateCommentDTO>().ReverseMap();
+
+		CreateMap<AssignActorMovieDTO, ActorMovie>().ReverseMap();
 	}
 }
