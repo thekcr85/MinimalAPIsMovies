@@ -62,5 +62,23 @@ namespace MinimalAPIsMovies.Repositories
 			movie.GenresMovies = mapper.Map(genresMovies, movie.GenresMovies); // Map the new genres to the existing GenresMovies collection
 			await context.SaveChangesAsync();
 		}
+
+		public async Task Assign(int id, List<ActorMovie> actors)
+		{
+			for (int i = 1; i <= actors.Count; i++)
+			{
+				actors[i - 1].Order = i; // Set the order for each ActorMovie based on its position in the collection
+			}
+
+			var movie = await context.Movies.Include(m => m.ActorsMovies).FirstOrDefaultAsync(m => m.Id == id);
+
+			if (movie == null)
+			{
+				throw new KeyNotFoundException($"Movie with ID {id} not found.");
+			}
+
+			movie.ActorsMovies = mapper(actors, movie.ActorsMovies); // Map the new actors to the existing ActorsMovies collection
+			await context.SaveChangesAsync();
+		}
 	}
 }
