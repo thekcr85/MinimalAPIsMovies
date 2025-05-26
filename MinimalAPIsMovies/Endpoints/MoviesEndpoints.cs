@@ -116,16 +116,16 @@ namespace MinimalAPIsMovies.Endpoints
 
 		static async Task<Results<NotFound, NoContent, BadRequest<string>>> AssignActors(int id, List<AssignActorMovieDTO> actorsDTO, IMovieRepository movieRepository, IActorRepository actorRepository, IMapper mapper)
 		{
-			if (!await movieRepository.Exists(id))
+			if (!await movieRepository.Exists(id)) // Check if the movie exists
 			{
 				return TypedResults.NotFound();
 			}
-			var existingActorsIds = new List<int>();
-			var actorsIds = actorsDTO.Select(a => a.ActorId).ToList();
+			var existingActorsIds = new List<int>(); // Initialize a list to hold existing actor IDs
+			var actorsIds = actorsDTO.Select(a => a.ActorId).ToList(); // Extract actor IDs from the DTOs
 
-			if (actorsIds.Count != 0)
+			if (actorsIds.Count != 0) // If there are actor IDs provided
 			{
-				existingActorsIds = await actorRepository.Exists(actorsIds);
+				existingActorsIds = await actorRepository.Exists(actorsIds); // Check which of the provided actor IDs exist in the database
 			}
 
 			if (existingActorsIds.Count != actorsDTO.Count) // Check if all provided actor IDs exist

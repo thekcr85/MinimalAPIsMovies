@@ -23,6 +23,8 @@ namespace MinimalAPIsMovies.Repositories
 		{
 			return await context.Movies
 				.Include(m => m.Comments) // Include Comments navigation property
+				.Include(m => m.GenresMovies).ThenInclude(gm => gm.Genre) // Include GenresMovies and Genre navigation properties
+				.Include(m => m.ActorsMovies).ThenInclude(am => am.Actor) // Include ActorsMovies and Actor navigation properties
 				.AsNoTracking().FirstOrDefaultAsync(m => m.Id == id);
 		}
 
