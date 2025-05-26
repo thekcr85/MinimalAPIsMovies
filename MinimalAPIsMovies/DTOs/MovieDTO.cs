@@ -9,5 +9,6 @@
 		public string? Poster { get; set; }
 		public IEnumerable<CommentDTO> Comments { get; set; } = new List<CommentDTO>();
 		public IEnumerable<GenreDTO> Genres { get; set; } = new List<GenreDTO>();
+		public IEnumerable<ActorMovieDTO> Actors { get; set; } = new List<ActorMovieDTO>();
 	}
 }

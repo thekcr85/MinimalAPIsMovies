@@ -8,22 +8,20 @@ public class AutoMapperProfiles : Profile
 {
 	public AutoMapperProfiles()
 	{
-		CreateMap<Genre, GenreDTO>().ReverseMap(); // Maps Genre to GenreDTO and vice versa
-		CreateMap<Genre, CreateGenreDTO>().ReverseMap();
+		CreateMap<Genre, GenreDTO>();
+		CreateMap<CreateGenreDTO, Genre>();
 
-		CreateMap<Actor, ActorDTO>().ReverseMap();
-		CreateMap<Actor, CreateActorDTO>().ReverseMap()
-			.ForMember(p => p.Picture, options => options.Ignore()); // Ignore the Picture property when mapping
-																	 // from CreateActorDTO to Actor, as it will be handled separately
+		CreateMap<Actor, ActorDTO>();
+		CreateMap<CreateActorDTO, Actor>().ForMember(p => p.Picture, options => options.Ignore());
 
-		CreateMap<Movie, MovieDTO>().ReverseMap();
-		CreateMap<Movie, CreateMovieDTO>().ReverseMap()
-			.ForMember(p => p.Poster, options => options.Ignore()); // Ignore the Poster property when mapping
-																	// from CreateMovieDTO to Movie, as it will be handled separately
+		CreateMap<Movie, MovieDTO>().ForMember(x => x.Genres, entity => entity.MapFrom(p => p.GenresMovies.Select(gm => new GenreDTO { Id = gm.GenreId, Name = gm.Genre.Name})));
+		CreateMap<CreateMovieDTO, Movie>().ForMember(p => p.Poster, options => options.Ignore());
 		
-		CreateMap<Comment, CommentDTO>().ReverseMap();
-		CreateMap<Comment, CreateCommentDTO>().ReverseMap();
+		CreateMap<Comment, CommentDTO>();
+		CreateMap<CreateCommentDTO, Comment>();
 
-		CreateMap<AssignActorMovieDTO, ActorMovie>().ReverseMap();
+		CreateMap<AssignActorMovieDTO, ActorMovie>();
+
+
 	}
 }
