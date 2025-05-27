@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using MinimalAPIsMovies.DTOs;
+using MinimalAPIsMovies.Filters;
 using MinimalAPIsMovies.Models;
 using MinimalAPIsMovies.Repositories;
+using MinimalAPIsMovies.Validations;
 
 namespace MinimalAPIsMovies.Endpoints
 {
@@ -14,7 +16,7 @@ namespace MinimalAPIsMovies.Endpoints
 		{
 			group.MapGet("/", GetComments).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("GetComments"));
 			group.MapGet("/{id}", GetComment);
-			group.MapPost("/", CreateComment);
+			group.MapPost("/", CreateComment).AddEndpointFilter<ValidationFilter<CreateCommentDTO>>();
 			group.MapPut("/{id}", UpdateComment);
 			group.MapDelete("/{id}", DeleteComment); 
 
