@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
 using MinimalAPIsMovies.DTOs;
+using MinimalAPIsMovies.Filters;
 using MinimalAPIsMovies.Models;
 using MinimalAPIsMovies.Repositories;
 using System.Runtime.CompilerServices;
@@ -15,8 +16,8 @@ namespace MinimalAPIsMovies.Endpoints
 		{
 			group.MapGet("/", GetGenres).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("GetGenres"));
 			group.MapGet("/{id}", GetGenre);
-			group.MapPost("/", CreateGenre);
-			group.MapPut("/{id}", UpdateGenre);
+			group.MapPost("/", CreateGenre).AddEndpointFilter<GenresValidationFilter>();
+			group.MapPut("/{id}", UpdateGenre).AddEndpointFilter<GenresValidationFilter>();
 			group.MapDelete("/{id}", DeleteGenre);
 
 			return group;
@@ -43,13 +44,8 @@ namespace MinimalAPIsMovies.Endpoints
 			return TypedResults.Ok(genreDTO);
 		}
 
-		static async Task<Results<Created<GenreDTO>, ValidationProblem>> CreateGenre(CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore, IMapper mapper, IValidator<CreateGenreDTO> validator)
+		static async Task<Created<GenreDTO>> CreateGenre(CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore, IMapper mapper, IValidator<CreateGenreDTO> validator)
 		{
-			var validationResult = await validator.ValidateAsync(createGenreDTO);
-			if (!validationResult.IsValid)
-			{
-				return TypedResults.ValidationProblem(validationResult.ToDictionary());
-			}
 			var genre = mapper.Map<Genre>(createGenreDTO); // Use AutoMapper to map DTO to model
 			var id = await genreRepository.Create(genre); // Create the genre and get the new ID
 			await outputCacheStore.EvictByTagAsync("GetGenres", default); // Evict the cache for GetGenres
