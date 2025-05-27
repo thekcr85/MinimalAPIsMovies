@@ -9,7 +9,7 @@ namespace MinimalAPIsMovies.Validations
 		public CreateCommentDTOValidator()
 		{
 			RuleFor(x => x.Body)
-				.NotEmpty().WithMessage(ValidationMessages.NonEmpty)
+				.NotEmpty().WithMessage(ValidationMessages.NonEmpty);
 		}
 	}
 }
