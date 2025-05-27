@@ -1,7 +1,9 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using MinimalAPIsMovies.Data;
 using MinimalAPIsMovies.Endpoints;
+using MinimalAPIsMovies.Models;
 using MinimalAPIsMovies.Repositories;
 using MinimalAPIsMovies.Services;
 
@@ -37,10 +39,24 @@ builder.Services.AddOutputCache();
 
 builder.Services.AddProblemDetails();
 
+builder.Services.AddAuthentication();
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 app.UseExceptionHandler(exceptionHandlerApp => exceptionHandlerApp.Run(async context =>
 {
+	var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+	var error = new Error();
+	error.Date = DateTime.UtcNow;
+	error.ErrorMessage = exception.Message;
+	error.StackTrace = exception.StackTrace;
+
+	var errorRepository = context.RequestServices.GetRequiredService<IErrorRepository>();
+	await errorRepository.Create(error);
+
 	await Results.BadRequest(new
 	{
 		type = "error",
@@ -56,6 +72,8 @@ app.UseStaticFiles();
 app.UseCors();
 
 app.UseOutputCache();
+
+app.UseAuthorization();
 
 app.MapGet("/error", () =>
 {
