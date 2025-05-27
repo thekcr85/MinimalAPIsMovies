@@ -14,7 +14,7 @@ namespace MinimalAPIsMovies.Endpoints
 	{
 		public static RouteGroupBuilder MapGenres(this RouteGroupBuilder group)
 		{
-			group.MapGet("/", GetGenres).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("GetGenres"));
+			group.MapGet("/", GetGenres).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("GetGenres")).RequireAuthorization();
 			group.MapGet("/{id}", GetGenre);
 			group.MapPost("/", CreateGenre).AddEndpointFilter<ValidationFilter<CreateGenreDTO>>();
 			group.MapPut("/{id}", UpdateGenre).AddEndpointFilter<ValidationFilter<CreateGenreDTO>>();

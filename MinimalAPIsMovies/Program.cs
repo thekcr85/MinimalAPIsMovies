@@ -39,7 +39,7 @@ builder.Services.AddOutputCache();
 
 builder.Services.AddProblemDetails();
 
-builder.Services.AddAuthentication();
+builder.Services.AddAuthentication().AddJwtBearer();
 
 builder.Services.AddAuthorization();
 
