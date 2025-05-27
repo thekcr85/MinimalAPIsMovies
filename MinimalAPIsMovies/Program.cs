@@ -34,13 +34,32 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddOutputCache();
 
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
+
+app.UseExceptionHandler(exceptionHandlerApp => exceptionHandlerApp.Run(async context =>
+{
+	await Results.BadRequest(new
+	{
+		type = "error",
+		message = "An unexpected error occurred. Please try again later.",
+		status = 400
+	}).ExecuteAsync(context);
+}));
+
+app.UseStatusCodePages(); // Use this for development; in production, use a custom error handler
 
 app.UseStaticFiles();
 
 app.UseCors();
 
 app.UseOutputCache();
+
+app.MapGet("/error", () =>
+{
+	throw new InvalidOperationException("This is a test error for the error handling middleware.");
+});
 
 app.MapGroup("/genres").MapGenres();
 app.MapGroup("/actors").MapActors();
