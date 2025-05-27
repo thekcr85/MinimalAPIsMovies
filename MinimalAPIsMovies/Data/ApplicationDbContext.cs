@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MinimalAPIsMovies.Models;
@@ -37,6 +38,15 @@ namespace MinimalAPIsMovies.Data
 				modelBuilder.Entity<GenreMovie>().HasKey(gm => new { gm.MovieId, gm.GenreId }); // Composite key for the join entity 
 
 				modelBuilder.Entity<ActorMovie>().HasKey(am => new { am.ActorId, am.MovieId }); // Composite key for the join entity
+
+				modelBuilder.Entity<IdentityUser>().ToTable("Users");
+				modelBuilder.Entity<IdentityRole>().ToTable("Roles");
+				modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RolesClaims");
+				modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UsersClaims");
+				modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UsersLogins");
+				modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UsersRoles");
+				modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UsersTokens");
+
 			}
 		}
 	}
