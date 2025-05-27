@@ -16,7 +16,7 @@ namespace MinimalAPIsMovies.Validations
 			var minimumDate = new DateTime(1900, 1, 1);
 
 			RuleFor(x => x.DateOfBirth)
-				.GreaterThanOrEqualTo(minimumDate).WithMessage();
+				.GreaterThanOrEqualTo(minimumDate).WithMessage(ValidationMessages.GreaterThanDate(minimumDate));
 
 		}
 	}

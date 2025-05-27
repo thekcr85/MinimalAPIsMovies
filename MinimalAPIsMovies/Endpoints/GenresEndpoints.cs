@@ -16,8 +16,8 @@ namespace MinimalAPIsMovies.Endpoints
 		{
 			group.MapGet("/", GetGenres).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("GetGenres"));
 			group.MapGet("/{id}", GetGenre);
-			group.MapPost("/", CreateGenre).AddEndpointFilter<GenresValidationFilter>();
-			group.MapPut("/{id}", UpdateGenre).AddEndpointFilter<GenresValidationFilter>();
+			group.MapPost("/", CreateGenre).AddEndpointFilter<ValidationFilter<CreateGenreDTO>>();
+			group.MapPut("/{id}", UpdateGenre).AddEndpointFilter<ValidationFilter<CreateGenreDTO>>();
 			group.MapDelete("/{id}", DeleteGenre);
 
 			return group;
@@ -44,7 +44,7 @@ namespace MinimalAPIsMovies.Endpoints
 			return TypedResults.Ok(genreDTO);
 		}
 
-		static async Task<Created<GenreDTO>> CreateGenre(CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore, IMapper mapper, IValidator<CreateGenreDTO> validator)
+		static async Task<Created<GenreDTO>> CreateGenre(CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore, IMapper mapper)
 		{
 			var genre = mapper.Map<Genre>(createGenreDTO); // Use AutoMapper to map DTO to model
 			var id = await genreRepository.Create(genre); // Create the genre and get the new ID
@@ -53,15 +53,8 @@ namespace MinimalAPIsMovies.Endpoints
 			return TypedResults.Created($"/genres/{id}", genreDTO);
 		}
 
-		static async Task<Results<NoContent, NotFound, ValidationProblem>> UpdateGenre(int id, CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore, IMapper mapper, IValidator<CreateGenreDTO> validator)
+		static async Task<Results<NoContent, NotFound>> UpdateGenre(int id, CreateGenreDTO createGenreDTO, IGenreRepository genreRepository, IOutputCacheStore outputCacheStore, IMapper mapper)
 		{
-			var validationResult = await validator.ValidateAsync(createGenreDTO);
-
-			if (!validationResult.IsValid)
-			{
-				return TypedResults.ValidationProblem(validationResult.ToDictionary());
-			}
-
 			var exists = await genreRepository.Exists(id);
 
 			if (!exists)
